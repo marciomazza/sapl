@@ -1199,6 +1199,9 @@ def migrar_todos_os_models(apagar_do_legado):
 def migrar_model(model, apagar_do_legado):
     print("Migrando %s..." % model.__name__)
 
+    # apaga qualquer registro criado automaticamente pelas migrations do django
+    model.objects.all().delete()
+
     model_legado, tabela_legado, campos_pk_legado = get_estrutura_legado(model)
 
     if len(campos_pk_legado) == 1:
