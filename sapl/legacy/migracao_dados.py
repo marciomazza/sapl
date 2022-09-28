@@ -78,6 +78,7 @@ from sapl.sessao.models import (
     ExpedienteSessao,
     OrdemDia,
     RegistroVotacao,
+    SessaoPlenaria,
     TipoResultadoVotacao,
 )
 from sapl.utils import normalize
@@ -1789,6 +1790,10 @@ def adjust_expediente_sessao(
     new.conteudo = remove_style(new.conteudo)
 
 
+def adjust_sessao_plenaria(new: SessaoPlenaria, old: legacy_models.SessaoPlenaria):
+    new.publicar_pauta = True
+
+
 AJUSTE_ANTES_SALVAR = {
     Autor: adjust_autor,
     TipoAutor: adjust_tipo_autor,
@@ -1813,6 +1818,7 @@ AJUSTE_ANTES_SALVAR = {
     ExpedienteSessao: adjust_expediente_sessao,
     Reuniao: adjust_reuniao_comissao,
     ComposicaoMesa: adjust_composicao_mesa,
+    SessaoPlenaria: adjust_sessao_plenaria,
 }
 
 AJUSTE_DEPOIS_SALVAR = {NormaJuridica: adjust_normajuridica_depois_salvar}
