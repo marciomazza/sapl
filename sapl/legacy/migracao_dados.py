@@ -1103,7 +1103,7 @@ def do_flush():
     info("O banco acabou de ser criado e está vazio => prosseguimos")
 
 
-def migrar_dados(primeira_migracao=False, apagar_do_legado=False):
+def migrar_dados(primeira_migracao=True, apagar_do_legado=False):
     try:
         # limpa tudo antes de migrar
         _cached_get_all_ids_from_model.cache_clear()
