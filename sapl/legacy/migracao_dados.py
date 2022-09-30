@@ -1070,10 +1070,6 @@ def do_flush():
     # )
     # fill_vinculo_norma_juridica()
     #
-    # # tb apagamos os dados do reversion, p nao confundir apagados_pelo_usuario
-    # Revision.objects.all().delete()
-    # Version.objects.all().delete()
-    #
     # apaga tipos de autor padrão (criados no flush acima)
     # TipoAutor.objects.all().delete()
     #
@@ -1086,6 +1082,14 @@ def do_flush():
     #
     # Se não estiver, recrie o banco antes para rodar a migração usando:
     # sapl/legacy/scripts/recria_um_db_postgres.sh
+
+    # apagamos qualquer registro criado automaticamente pelas migrations do django
+    for model in get_models_a_migrar():
+        if model.objects.exists():
+            model.objects.all().delete()
+    # tb apagamos os dados do reversion, p nao confundir apagados_pelo_usuario
+    Revision.objects.all().delete()
+    Version.objects.all().delete()
 
     for model in (
         Parlamentar,
@@ -1198,9 +1202,6 @@ def migrar_todos_os_models(apagar_do_legado):
 
 def migrar_model(model, apagar_do_legado):
     print("Migrando %s..." % model.__name__)
-
-    # apaga qualquer registro criado automaticamente pelas migrations do django
-    model.objects.all().delete()
 
     model_legado, tabela_legado, campos_pk_legado = get_estrutura_legado(model)
 
