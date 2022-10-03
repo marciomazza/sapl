@@ -1084,7 +1084,7 @@ def do_flush():
     # sapl/legacy/scripts/recria_um_db_postgres.sh
 
     # apagamos qualquer registro criado automaticamente pelas migrations do django
-    for model in get_models_a_migrar():
+    for model in reversed(get_models_a_migrar()):
         if model.objects.exists():
             model.objects.all().delete()
     # tb apagamos os dados do reversion, p nao confundir apagados_pelo_usuario
