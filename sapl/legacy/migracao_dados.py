@@ -1104,6 +1104,9 @@ def do_flush():
     ):
         assert not model.objects.exists()
 
+    # limpa lista de autores para operadores
+    autores_para_operadores.clear()
+
     info("O banco acabou de ser criado e está vazio => prosseguimos")
 
 
@@ -1674,6 +1677,9 @@ def adjust_normajuridica_depois_salvar():
     )
 
 
+autores_para_operadores = defaultdict(list)
+
+
 def adjust_autor(new: Autor, old: legacy_models.Autor):
     # vincula autor com o objeto relacionado, tentando os três campos antigos
     # o primeiro campo preenchido será usado, podendo lançar ForeignKeyFaltando
@@ -1704,7 +1710,16 @@ def adjust_autor(new: Autor, old: legacy_models.Autor):
         grupo_autor = Group.objects.get(name="Autor")
         user.groups.add(grupo_autor)
         # baseado em sapl/base/migrations/0046_auto_20210314_1532.py
-        new.operadores.add(user)
+        # só é possível associar o usuário depois de salvar o autor
+        # então guardamos para o final da migração de Autor
+        # https://stackoverflow.com/q/7837033
+        autores_para_operadores[new.pk].append(user)
+
+
+def adjust_autor_depois_de_salvar():
+    for autor_id, users in autores_para_operadores.items():
+        autor = Autor.objects.get(id=autor_id)
+        autor.operadores.add(*users)
 
 
 def adjust_comissao(new: Comissao, old: legacy_models.Comissao):
@@ -1821,7 +1836,10 @@ AJUSTE_ANTES_SALVAR = {
     SessaoPlenaria: adjust_sessao_plenaria,
 }
 
-AJUSTE_DEPOIS_SALVAR = {NormaJuridica: adjust_normajuridica_depois_salvar}
+AJUSTE_DEPOIS_SALVAR = {
+    Autor: adjust_autor_depois_de_salvar,
+    NormaJuridica: adjust_normajuridica_depois_salvar,
+}
 
 
 # MARCO ######################################################################
