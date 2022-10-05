@@ -68,9 +68,9 @@ def gerar_backup_postgres():
 def compactar_media():
     # tar de media/sapl
     print("Criando tar de media... ", end="", flush=True)
-    arq_tar = DIR_REPO.child("{}.media.tar".format(NOME_BANCO_LEGADO))
+    arq_tar = DIR_REPO.child("{}.media.tar.gz".format(NOME_BANCO_LEGADO))
     arq_tar.remove()
-    subprocess.check_output(["tar", "cfh", arq_tar, "-C", DIR_REPO, "sapl"])
+    subprocess.check_output(["tar", "czvfh", arq_tar, "-C", DIR_REPO, "sapl"])
     print("SUCESSO")
 
 
