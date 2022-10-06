@@ -65,13 +65,18 @@ def gerar_backup_postgres():
     print("SUCESSO")
 
 
+def compactar_pasta(sufixo, pasta):
+    print(f"Criando tar da pasta {pasta}... ", end="", flush=True)
+    arq_tar = DIR_REPO.child(f"{NOME_BANCO_LEGADO}.{sufixo}")
+    arq_tar.remove()
+    subprocess.check_output(["tar", "czvfh", arq_tar, "-C", DIR_REPO, pasta])
+    print("SUCESSO")
+
 def compactar_media():
     # tar de media/sapl
-    print("Criando tar de media... ", end="", flush=True)
-    arq_tar = DIR_REPO.child("{}.media.tar.gz".format(NOME_BANCO_LEGADO))
-    arq_tar.remove()
-    subprocess.check_output(["tar", "czvfh", arq_tar, "-C", DIR_REPO, "sapl"])
-    print("SUCESSO")
+    compactar_pasta("media.tar.gz", "sapl")
+    # tar do sapl_documentos com documentos que não correspondem a nenhum registro
+    compactar_pasta("sapl_documentos_remanescentes.tar.gz", "sapl_documentos")
 
 
 PROPOSICAO_UPLOAD_TO = Proposicao._meta.get_field("texto_original").upload_to  # type: ignore
