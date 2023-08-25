@@ -48,14 +48,14 @@ def migrar(primeira_migracao=True, apagar_do_legado=False):
         verifica_diff(sigla)
 
 
-def gerar_backup_postgres():
+def gerar_backup_postgres(nome_banco=NOME_BANCO_LEGADO):
     print("Gerando backup do banco... ", end="", flush=True)
-    arq_backup = DIR_REPO.child("{}.backup".format(NOME_BANCO_LEGADO))
+    arq_backup = DIR_REPO.child("{}.backup".format(nome_banco))
     arq_backup.remove()
     backup_cmds = [
         f"""
         docker exec postgres pg_dump -U sapl --format custom --blobs --verbose
-        --file {arq_backup.name} {NOME_BANCO_LEGADO}""",
+        --file {arq_backup.name} {nome_banco}""",
         f"docker cp postgres:{arq_backup.name} {arq_backup}",
         f"docker exec postgres rm {arq_backup.name}",
     ]
@@ -71,6 +71,7 @@ def compactar_pasta(sufixo, pasta):
     arq_tar.remove()
     subprocess.check_output(["tar", "czvfh", arq_tar, "-C", DIR_REPO, pasta])
     print("SUCESSO")
+
 
 def compactar_media():
     # tar de media/sapl
